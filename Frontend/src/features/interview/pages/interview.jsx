@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import '../style/interview.scss'
+import '../style/Interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 
 
@@ -66,6 +66,8 @@ const Interview = () => {
         if (interviewId && interviewId !== "undefined") {
             getReportById(interviewId)
         }
+        // getReportById comes from context hook and should run when route param changes.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ interviewId ])
 
 

@@ -3,7 +3,7 @@ import "../auth.form.scss";
 import { useNavigate,Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 
-const login = () => {
+const Login = () => {
 
   const { loading, handleLogin } = useAuth()
   const navigate = useNavigate()
@@ -55,4 +55,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;

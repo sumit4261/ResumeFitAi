@@ -76,6 +76,13 @@ Create a `.env` file inside `Backend/`:
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 GOOGLE_GENAI_API_KEY=your_google_genai_api_key
+CLIENT_URL=http://localhost:5173
+```
+
+Create a `.env` file inside `Frontend/` (for production/deployment API URL):
+
+```env
+VITE_API_BASE_URL=http://localhost:4040
 ```
 
 ## Local Setup

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import "../style/home.scss"
+import "../style/Home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
 
@@ -14,6 +14,8 @@ const Home = () => {
 
     useEffect(() => {
         getReports()
+        // getReports comes from context hook and is intentionally invoked on first mount.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleGenerateReport = async () => {
