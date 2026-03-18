@@ -35,7 +35,7 @@ const Register = () => {
               type="text"
               id="username"
               name="email"
-              placeholder="enter Username"
+              placeholder="Enter username"
             />
           </div>
 
@@ -46,7 +46,7 @@ const Register = () => {
               type="email"
               id="email"
               name="email"
-              placeholder="enter email"
+              placeholder="Enter email address"
             />
           </div>
 
@@ -57,7 +57,7 @@ const Register = () => {
               type="password"
               id="password"
               name="password"
-              placeholder="enter password"
+              placeholder="Enter password"
             />
           </div>
           <button className="button primary-button">Register</button>

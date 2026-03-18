@@ -74,16 +74,14 @@ export async function logout(){
 }
 
 /**
- * Fetches the currently logged-in user's information.
- * This endpoint usually reads the authentication token/cookie
- * and returns the user's profile details.
- * 
- * @returns {Promise<Object>} Returns the authenticated user's data
+ * Fetches the currently authenticated user's profile.
+ * @returns {Promise<Object>} Returns the current user data
  */
-export async function getMe() {
-    
+export async function getMe(){
+
     try{
-        const response = await api.get("/api/auth/get-me")
+        const response = await api.get("/api/auth/get-me");
+
         return response.data;
     }
     catch(err){
