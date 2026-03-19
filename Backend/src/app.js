@@ -3,7 +3,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors")
 
 const app = express();
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT_URL = process.env.CLIENT_URL
 
 app.use(express.json());
 app.use(cookieParser());
