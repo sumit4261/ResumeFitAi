@@ -8,6 +8,7 @@ const Home = () => {
     const { loading, generateReport, reports, getReports } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ errors, setErrors ] = useState({})
     const [ errorMessage, setErrorMessage ] = useState("")
     const resumeInputRef = useRef()
 
@@ -20,24 +21,37 @@ const Home = () => {
     }, [])
 
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[ 0 ]
+        const resumeFile = resumeInputRef.current?.files?.[0]
         const trimmedJobDescription = jobDescription.trim()
         const trimmedSelfDescription = selfDescription.trim()
 
         setErrorMessage("")
+        setErrors({})
+
+        let hasError = false
+        const newErrors = {}
 
         if (!trimmedJobDescription) {
+            newErrors.jobDescription = true
             setErrorMessage("Job description is required.")
-            return
+            hasError = true
         }
 
         if (!resumeFile && !trimmedSelfDescription) {
-            setErrorMessage("Please provide either a resume PDF or a self description.")
-            return
+            newErrors.resume = true
+            newErrors.selfDescription = true
+            if (!hasError) setErrorMessage("Please provide either a resume PDF or a self description.")
+            hasError = true
         }
 
         if (resumeFile && resumeFile.type !== "application/pdf") {
-            setErrorMessage("Only PDF resumes are supported. Please upload a .pdf file.")
+            newErrors.resume = true
+            if (!hasError) setErrorMessage("Only PDF resumes are supported. Please upload a .pdf file.")
+            hasError = true
+        }
+
+        if (hasError) {
+            setErrors(newErrors)
             return
         }
 
@@ -51,14 +65,6 @@ const Home = () => {
         if (data?._id) {
             navigate(`/interview/${data._id}`)
         }
-    }
-
-    if (loading) {
-        return (
-            <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
-            </main>
-        )
     }
 
     return (
@@ -84,8 +90,8 @@ const Home = () => {
                             <span className='badge badge--required'>Required</span>
                         </div>
                         <textarea
-                            onChange={(e) => { setJobDescription(e.target.value) }}
-                            className='panel__textarea'
+                            onChange={(e) => { setJobDescription(e.target.value); setErrors(prev => ({...prev, jobDescription: false})) }}
+                            className={`panel__textarea ${errors.jobDescription ? 'has-error' : ''}`}
                             placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
                             maxLength={5000}
                         />
@@ -110,13 +116,13 @@ const Home = () => {
                                 Upload Resume
                                 <span className='badge badge--best'>Best Results</span>
                             </label>
-                            <label className='dropzone' htmlFor='resume'>
+                            <label className={`dropzone ${errors.resume ? 'has-error' : ''}`} htmlFor='resume'>
                                 <span className='dropzone__icon'>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
                                 </span>
                                 <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
                                 <p className='dropzone__subtitle'>PDF (Max 5MB)</p>
-                                <input ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,application/pdf' />
+                                <input onChange={() => setErrors(prev => ({...prev, resume: false}))} ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,application/pdf' />
                             </label>
                         </div>
 
@@ -127,10 +133,10 @@ const Home = () => {
                         <div className='self-description'>
                             <label className='section-label' htmlFor='selfDescription'>Quick Self-Description</label>
                             <textarea
-                                onChange={(e) => { setSelfDescription(e.target.value) }}
+                                onChange={(e) => { setSelfDescription(e.target.value); setErrors(prev => ({...prev, selfDescription: false})) }}
                                 id='selfDescription'
                                 name='selfDescription'
-                                className='panel__textarea panel__textarea--short'
+                                className={`panel__textarea panel__textarea--short ${errors.selfDescription ? 'has-error' : ''}`}
                                 placeholder="Briefly describe your experience, key skills, and years of experience if you don't have a resume handy..."
                             />
                         </div>
@@ -156,9 +162,19 @@ const Home = () => {
                     <span className='footer-info'>AI-Powered Strategy Generation &bull; Approx 30s</span>
                     <button
                         onClick={handleGenerateReport}
-                        className='generate-btn'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-                        Generate My Interview Strategy
+                        disabled={loading}
+                        className={`generate-btn ${loading ? 'btn--loading' : ''}`}>
+                        {loading ? (
+                            <>
+                                <span className="spinner"></span>
+                                Generating Plan...
+                            </>
+                        ) : (
+                            <>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
+                                Generate My Interview Strategy
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
