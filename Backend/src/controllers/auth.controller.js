@@ -2,7 +2,7 @@ const userModel = require("../models/user.model");
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const blacklistTokenModel = require("../models/blacklist.model");
-const authRouter = require("../routes/auth.routes");
+// const authRouter = require("../routes/auth.routes");
 
 
 /**
@@ -91,8 +91,8 @@ async function loginUserController(req,res){
 
 res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production", // Consider setting to true if testing cross-port Lax issues
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Lax should work for localhost same-site
     maxAge: 24 * 60 * 60 * 1000
 })
 res.status(200).json({
