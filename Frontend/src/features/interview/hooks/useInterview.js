@@ -19,10 +19,11 @@ export const useInterview = () => {
             const response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
             const interviewReport = response?.interviewReport || null
             setReport(interviewReport)
-            return interviewReport
+            return { report: interviewReport, error: null }
         } catch (error) {
-            console.log(error)
-            return null
+            const backendMessage = error?.response?.data?.message || error?.message || "Failed to generate report. Please try again."
+            console.error("generateReport failed:", backendMessage)
+            return { report: null, error: backendMessage }
         } finally {
             setLoading(false)
         }

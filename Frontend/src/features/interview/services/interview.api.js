@@ -11,15 +11,17 @@ baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:4040" ,
 export const generateInterviewReport = async ({ jobDescription, selfDescription, resumeFile }) => {
 
     const formData = new FormData()
-    formData.append("jobDescription", jobDescription)
-    formData.append("selfDescription", selfDescription)
-    formData.append("resume", resumeFile)
+    formData.append("jobDescription", jobDescription || "")
 
-    const response = await api.post("/api/interview/", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data"
-        }
-    })
+    if (selfDescription?.trim()) {
+        formData.append("selfDescription", selfDescription.trim())
+    }
+
+    if (resumeFile instanceof File) {
+        formData.append("resume", resumeFile)
+    }
+
+    const response = await api.post("/api/interview", formData)
 
     return response.data
 

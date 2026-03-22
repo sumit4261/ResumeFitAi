@@ -1,31 +1,92 @@
 const pdfParse = require('pdf-parse')
-const generateInterviewReport = require('../services/ai.service')
+const { generateInterviewReport } = require('../services/ai.service')
 const interviewReportModel = require('../models/interviewReport.model')
 
 async function generateReportController(req,res){
     try {
+        console.log("generateReportController called. req.file:", !!req.file, "req.body:", req.body);
+        
         let resumeContentText = ""
+        const selfDescription = req.body.selfDescription?.trim() || ""
+
         if (req.file) {
-            resumeContentText = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
-            resumeContentText = resumeContentText.text
+            try {
+                console.log("Parsing PDF file:", req.file.originalname, "| mimetype:", req.file.mimetype, "| buffer size:", req.file.buffer?.length ?? "NO BUFFER");
+                const isPdf = req.file.mimetype === "application/pdf"
+
+                if (!isPdf) {
+                    if (selfDescription) {
+                        console.warn("Unsupported resume type, continuing with selfDescription only:", req.file.mimetype);
+                    } else {
+                        return res.status(400).json({ message: "Only PDF resume files are supported" })
+                    }
+                } else if (!req.file.buffer || req.file.buffer.length === 0) {
+                    console.error("PDF buffer is empty or missing!");
+                    if (!selfDescription) {
+                        return res.status(400).json({ message: "Resume file appears to be empty. Please try uploading again." })
+                    }
+                    console.warn("Empty PDF buffer, continuing with selfDescription only.");
+                } else {
+                    const pdfData = await pdfParse(req.file.buffer)
+                    resumeContentText = pdfData.text
+                    console.log("PDF parsed successfully. Text length:", resumeContentText.length);
+                    if (!resumeContentText.trim()) {
+                        console.warn("PDF parsed but extracted no text — likely a scanned/image-only PDF.");
+                    }
+                }
+            } catch (pdfError) {
+                console.error("PDF parsing error name:", pdfError.name);
+                console.error("PDF parsing error message:", pdfError.message);
+                console.error("PDF parsing error stack:", pdfError.stack);
+                if (!selfDescription) {
+                    return res.status(400).json({ message: "Could not read the PDF. Make sure it contains selectable text (not a scanned image). Or fill in the Self Description instead." })
+                }
+                console.warn("Unable to parse resume PDF, continuing with selfDescription only.");
+            }
+        } else {
+            console.log("No resume file provided");
         }
 
-        const { selfDescription, jobDescription } = req.body
+        const jobDescription = req.body.jobDescription?.trim() || ""
 
+        if (!jobDescription) {
+            return res.status(400).json({ message: "jobDescription is required" });
+        }
+
+        if (!selfDescription && !resumeContentText) {
+            return res.status(400).json({ message: "Provide either a resume file or selfDescription" });
+        }
+
+        console.log("Calling AI service...");
         const interviewReportByAi = await generateInterviewReport({
             resume: resumeContentText,
             selfDescription,
             jobDescription
         })
 
-        const interviewReport = await interviewReportModel.create({
-            user:req.user.id,
+        if (!interviewReportByAi) {
+            throw new Error("Failed to generate report from AI service");
+        }
+
+        console.log("AI service returned:", Object.keys(interviewReportByAi));
+
+        // Ensure title is present (required by model)
+        const reportData = {
+            user: req.user.id,
             resume: resumeContentText,
             selfDescription,
             jobDescription,
-            ...interviewReportByAi,
+            title: interviewReportByAi.title || "Interview Preparation Report",
+            matchScore: interviewReportByAi.matchScore,
+            technicalQuestions: interviewReportByAi.technicalQuestions,
+            behavioralQuestions: interviewReportByAi.behavioralQuestions,
+            skillGaps: interviewReportByAi.skillGaps,
+            preparationPlan: interviewReportByAi.preparationPlan
+        }
 
-        })
+        console.log("Saving to DB...");
+        const interviewReport = await interviewReportModel.create(reportData)
+        console.log("Report saved successfully");
         
         res.status(201).json({
             message: "Interview Report Generated Successfully",
