@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const tokenblackListModel = require("../models/blacklist.model")
 
 async function authUser(req ,res, next){
-
+    console.log("Cookies received:", req.cookies);
     const token = req.cookies.token;
 
     if(!token){

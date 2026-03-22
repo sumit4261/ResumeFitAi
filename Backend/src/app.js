@@ -3,6 +3,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors")
 
 const app = express();
+app.set('trust proxy', 1);
 const CLIENT_URL = process.env.CLIENT_URL
 
 app.use(express.json());
