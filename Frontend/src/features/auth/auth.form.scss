@@ -1,5 +1,5 @@
 main {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px - 4rem);
   width: 100%;
   display: flex;
   justify-content: center;
