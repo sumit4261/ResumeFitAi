@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import '../style/Interview.scss'
+import '../style/interview.scss'
 import { useInterview } from '../hooks/useInterview.js'
 import { useParams } from 'react-router'
 
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const QuestionCard = ({ item, index }) => {
-    const [ open, setOpen ] = useState(false)
+    const [open, setOpen] = useState(false)
     return (
         <div className='q-card'>
             <div className='q-card__header' onClick={() => setOpen(o => !o)}>
@@ -53,7 +53,7 @@ const RoadMapDay = ({ day }) => (
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
-    const [ activeNav, setActiveNav ] = useState('technical')
+    const [activeNav, setActiveNav] = useState('technical')
     const { interviewId } = useParams()
     const { report, getReportById, loading, getResumePdf } = useInterview()
 
@@ -61,7 +61,7 @@ const Interview = () => {
         if (interviewId && interviewId !== "undefined") {
             getReportById(interviewId)
         }
-    }, [ interviewId ])
+    }, [interviewId])
 
     if (loading || !report) {
         return (
@@ -94,12 +94,12 @@ const Interview = () => {
                             </button>
                         ))}
                     </div>
-                    
+
                     <button
                         onClick={() => { getResumePdf(interviewId) }}
                         className='button primary-button'
                     >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
                         Download PDF
                     </button>
                 </aside>
