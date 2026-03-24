@@ -10,6 +10,7 @@ const Home = () => {
     const [ selfDescription, setSelfDescription ] = useState("")
     const [ errors, setErrors ] = useState({})
     const [ errorMessage, setErrorMessage ] = useState("")
+    const [ selectedFile, setSelectedFile ] = useState(null)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
@@ -67,6 +68,23 @@ const Home = () => {
         }
     }
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            setSelectedFile(file.name)
+            setErrors(prev => ({...prev, resume: false}))
+        }
+    }
+
+    const removeFile = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (resumeInputRef.current) {
+            resumeInputRef.current.value = ""
+        }
+        setSelectedFile(null)
+    }
+
     return (
         <div className='home-page'>
 
@@ -95,7 +113,7 @@ const Home = () => {
                             placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
                             maxLength={5000}
                         />
-                        <div className='char-counter'>0 / 5000 chars</div>
+                        <div className='char-counter'>{jobDescription.length} / 5000 chars</div>
                     </div>
 
                     {/* Vertical Divider */}
@@ -116,13 +134,27 @@ const Home = () => {
                                 Upload Resume
                                 <span className='badge badge--best'>Best Results</span>
                             </label>
-                            <label className={`dropzone ${errors.resume ? 'has-error' : ''}`} htmlFor='resume'>
-                                <span className='dropzone__icon'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
-                                </span>
-                                <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
-                                <p className='dropzone__subtitle'>PDF (Max 5MB)</p>
-                                <input onChange={() => setErrors(prev => ({...prev, resume: false}))} ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,application/pdf' />
+                            <label className={`dropzone ${errors.resume ? 'has-error' : ''} ${selectedFile ? 'has-file' : ''}`} htmlFor='resume'>
+                                {selectedFile ? (
+                                    <div className='file-info'>
+                                        <span className='file-info__icon'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                        </span>
+                                        <div className='file-info__details'>
+                                            <p className='file-info__name'>{selectedFile}</p>
+                                            <button className='file-info__remove' onClick={removeFile}>Remove</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <span className='dropzone__icon'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
+                                        </span>
+                                        <p className='dropzone__title'>Click to upload or drag &amp; drop</p>
+                                        <p className='dropzone__subtitle'>PDF (Max 5MB)</p>
+                                    </>
+                                )}
+                                <input onChange={handleFileChange} ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,application/pdf' />
                             </label>
                         </div>
 
@@ -195,12 +227,6 @@ const Home = () => {
                 </section>
             )}
 
-            {/* Page Footer */}
-            <footer className='page-footer'>
-                <a href='#'>Privacy Policy</a>
-                <a href='#'>Terms of Service</a>
-                <a href='#'>Help Center</a>
-            </footer>
         </div>
     )
 }

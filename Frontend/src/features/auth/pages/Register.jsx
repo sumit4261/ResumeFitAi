@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate,Link } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import "../auth.form.scss";
 
 const Register = () => {
 
@@ -20,14 +21,22 @@ const Register = () => {
     }
   };
 
-   if(loading){
-    return (<main><h1>Loading....</h1></main>)
+  if(loading){
+    return (
+      <main>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <h1>Creating your account...</h1>
+        </div>
+      </main>
+    )
   }
 
   return (
     <main>
       <div className="form-container">
-        <h1>Register</h1>
+        <h1>Create Account</h1>
+        <p>Join ResumeFit AI to get tailored interview strategies.</p>
         <form onSubmit={handleSubmit}>
 
           <div className="input-group">
@@ -36,8 +45,9 @@ const Register = () => {
               onChange={(e) => {setUsername(e.target.value)}}
               type="text"
               id="username"
-              name="email"
+              name="username"
               placeholder="Enter username"
+              required
             />
           </div>
 
@@ -49,6 +59,7 @@ const Register = () => {
               id="email"
               name="email"
               placeholder="Enter email address"
+              required
             />
           </div>
 
@@ -60,12 +71,13 @@ const Register = () => {
               id="password"
               name="password"
               placeholder="Enter password"
+              required
             />
           </div>
-          <button className="button primary-button">Register</button>
+          <button className="button primary-button">Sign Up</button>
         </form>
 
-        <p>Already have an account? <Link to={"/login"}>Login</Link></p>
+        <p>Already have an account? <Link to={"/login"}>Sign In</Link></p>
       </div>
     </main>
   );

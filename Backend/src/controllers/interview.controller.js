@@ -1,5 +1,5 @@
 const pdfParse = require('pdf-parse')
-const { generateInterviewReport } = require('../services/ai.service')
+const { generateInterviewReport, generateResumePdf } = require('../services/ai.service')
 const interviewReportModel = require('../models/interviewReport.model')
 
 async function generateReportController(req,res){
@@ -161,10 +161,19 @@ async function generateResumePdfController(req, res) {
             })
         }
 
-        // Resume PDF generation service is not implemented yet.
-        return res.status(501).json({
-            message: "Resume PDF generation is not implemented yet."
+        const pdfBuffer = await generateResumePdf({
+            resume: interviewReport.resume,
+            selfDescription: interviewReport.selfDescription,
+            jobDescription: interviewReport.jobDescription
         })
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename=resume_${interviewReportId}.pdf`,
+            'Content-Length': pdfBuffer.length
+        })
+
+        return res.status(200).send(pdfBuffer)
     } catch (err) {
         console.error("Error generating resume PDF:", err)
         return res.status(500).json({
